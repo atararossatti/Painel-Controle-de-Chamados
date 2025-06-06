@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Controle de Chamados</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #f4f4f9, #e0e0e0);
+    color: #333;
+    padding: 20px;
+    transition: background-color 0.3s, color 0.3s;
+    }
+  
+    h2, h3 {
+    color: inherit;
+    }
+
+    h2, h3 {
+      color: inherit;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+    }
+
+    .menu-container {
+    position: relative;
+    display: inline-block;
+    margin-left: auto; /* Alinha o menu à direita */
+    } 
+
+    .menu-button {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: inherit;
+    }
+
+    .menu-options {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      color: #333;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      z-index: 1;
+      padding: 5px 0;
+      min-width: 150px;
+    }
+
+    .menu-options button {
+      background: none;
+      border: none;
+      padding: 8px 12px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .menu-options button:hover {
+      background-color: #f0f0f0;
+    }
+
+    body.dark {
+    background: #222; /* Cor de fundo para o tema escuro */
+    color: #f1f1f1; /* Cor do texto para o tema escuro */
+    } 
+
+    body.dark .form-container {
+    background-color: #444; /* Cor de fundo para o container do formulário no tema escuro */
+    color: #f1f1f1; /* Cor do texto para o container do formulário no tema escuro */
+    }
+
+    body.dark .table-wrapper {
+    background-color: #444; /* Cor de fundo para a tabela no tema escuro */
+    }
+
+    body.dark th, body.dark td {
+    background-color: #333; /* Cor de fundo para as células da tabela no tema escuro */
+    color: #f1f1f1; /* Cor do texto para as células da tabela no tema escuro */
+    }
+
+    body.dark .menu-options {
+      background-color: #333;
+      color: #f1f1f1;
+    }
+
+    body.dark .cabecalho {
+    background-color: #333; /* Cor de fundo para o cabeçalho no tema escuro */
+    }
+
+    body.dark .menu-options button:hover {
+      background-color: #555;
+    }
+
+    .form-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      background-color: #ffffff;
+      color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+
+    .form-container input, .form-container button {
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      flex: 1;
+      min-width: 150px;
+      transition: border-color 0.3s;
+    }
+
+    .form-container input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc; /* Cor da borda padrão */
+    border-radius: 5px;
+    text-transform: uppercase;
+    width: 100%; /* Garante que os inputs ocupem toda a largura disponível */
+    min-width: 200px; /* Largura mínima para os inputs */
+    background-color: #ffffff;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+    body.dark .form-container input::placeholder {
+    color: #ccc; /* Cor do texto do placeholder no tema escuro */
+    }
+
+    body.dark .form-container input {
+    background-color: #555; /* Cor de fundo para os inputs no tema escuro */
+    color: #f1f1f1; /* Cor do texto para os inputs no tema escuro */
+    border: 1px solid #666; /* Cor da borda para os inputs no tema escuro */
+    }
+
+    .form-container button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .form-container button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+    }
+
+    .table-wrapper {
+    overflow-x: auto;
+    background-color: #ffffff;
+    }
+
+    table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+    min-width: 800px;
+    }
+
+    th {
+      background-color: #e9ecef;
+      border-bottom: 2px solid #ccc;
+      font-weight: bold;
+      color: #000;
+    }
+
+    body.dark th {
+      background-color: #333;
+      color: #f1f1f1;
+      border-color: #555;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border: 1px solid #ccc;
+    }
+
+    .atrasado {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .dentro-prazo {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    #filtroTitulo, #filtroCliente {
+     margin-top: 15px; /* Espaçamento acima dos campos de filtro */
+    } 
+
+    #filtroTitulo {
+      width: 300px; /* LARGURA DIMINUÍDA */
+      margin: 10px 0;
+    }
+    #filtroCliente {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    #filtroCliente {
+      width: 200px; /* LARGURA DIMINUÍDA */
+      margin: 10px 0;
+    }
+
+    #filtroDataFinalizados {
+      width: 200px;
+      margin: 10px 0;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .tab-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      background-color: #0056b3;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .cabecalho {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo-titulo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #logoEmpresa {
+      height: 50px;
+    }
+
+    /* Modal styles */
+    #modalFinalizar {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    #modalFinalizar.active {
+      display: flex;
+    }
+
+    #modalContent {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      max-width: 90%;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      text-align: center;
+      color: #000;
+    }
+
+    #modalContent.dark {
+      background: #333;
+      color: #f1f1f1;
+    }
+
+    #modalContent label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    #modalContent input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    #modalContent button {
+      padding: 8px 16px;
+      margin: 0 5px;
+      font-weight: bold;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    #btnOk {
+      background-color: #28a745;
+      color: white;
+    }
+
+    #btnOk:hover {
+      background-color: #218838;
+    }
+
+    #btnCancel {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    #btnCancel:hover {
+      background-color: #c82333;
+    }
+
+    /* Count badges style */
+    .count-badge {
+      background-color: #0056b3;
+      color: white;
+      font-weight: bold;
+      border-radius: 50%;
+      padding: 5px 10px;
+      font-size: 14px;
+      margin-left: 8px;
+      user-select: none;
+    }
+
+    /* Footer style */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #e9ecef;
+      color: #333;
+      text-align: center;
+      font-size: 14px;
+      padding: 8px 0;
+      box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
+      user-select: none;
+    }
+
+    body.dark .footer {
+      background-color: #222;  /* Cor de fundo para o rodapé no tema escuro */
+      color: #ccc; /* Cor do texto para o rodapé no tema escuro */
+    }
+
+    body.dark .card {
+    background-color: #444; /* Cor de fundo para os cartões no tema escuro */
+    border: 1px solid #666; /* Cor da borda para os cartões no tema escuro */
+    color: #f1f1f1; /* Cor do texto para os cartões no tema escuro */
+    }
+
+    body.dark .card:hover {
+    background-color: #555; /* Cor de fundo ao passar o mouse no tema escuro */
+    }
+    body.dark .card a {
+  color: #f1f1f1; /* Cor do texto dos links no tema escuro */
+    }
+    body.dark .card a:hover {
+  color: #007bff; /* Cor do texto dos links ao passar o mouse no tema escuro */
+    }
+
+    /* Estilo para botões de ação apenas com ícone usando FontAwesome */
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+    .action-button {
+      border: none; /* Remove a borda */
+      background: none; /* Remove o fundo */
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      padding: 0; /* Remove o padding para que o ícone fique centralizado */
+      width: 44px;
+      height: 44px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      user-select: none;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+    }
+
+    .action-button.finalizar {
+      color: white;
+      box-shadow: 0 6px 12px rgba(45, 172, 55, 0.6);
+    }
+
+    .action-button.finalizar:hover {
+      transform: scale(1.2) rotate(-8deg);
+      box-shadow: 0 8px 16px rgba(74, 156, 37, 0.85);
+    }
+
+    .action-button.excluir {
+      color: white;
+      box-shadow: 0 6px 12px rgba(211, 63, 63, 0.7);
+    }
+
+    .action-button.excluir:hover {
+      transform: scale(1.2) rotate(8deg);
+      box-shadow: 0 8px 16px rgba(179, 47, 47, 0.9);
+    }
+
+    /* Para o link com ícone 🔗 Link */
+    a.link-icon {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s ease;
+      font-size: 18px;
+    }
+    a.link-icon:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+
+  .atalhos-cards {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative; /* Adicionado */
+    overflow: hidden; /* Adicionado */
+  }
+
+    .atalhos-cards h3 {
+    margin: 0 0 20px;
+    text-align: center;
+    } 
+
+    .cards-container {
+    display: flex; /* Alterado */
+    transition: transform 0.3s ease; /* Adicionado */
+    width: calc(100% * 4); /* Adicionado */
+  }
+
+  .card {
+  min-width: 200px; /* Largura mínima */
+  margin-right: 20px; /* Espaçamento entre os cartões */
+  display: flex; /* Usar flexbox */
+  flex-direction: column; /* Alinhar itens em coluna */
+  align-items: center; /* Centralizar horizontalmente */
+  justify-content: center; /* Centralizar verticalmente */
+  border-radius: 10px; /* Bordas arredondadas */
+  padding: 20px; /* Espaçamento interno */
+  background-color: #ffffff; /* Cor de fundo */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra */
+}
+
+  .arrow {
+  position: absolute; /* Adicionado */
+  top: 50%; /* Adicionado */
+  transform: translateY(-50%); /* Adicionado */
+  background-color: rgba(255, 255, 255, 0.8); /* Adicionado */
+  border: none; /* Adicionado */
+  border-radius: 50%; /* Adicionado */
+  padding: 10px; /* Adicionado */
+  cursor: pointer; /* Adicionado */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adicionado */
+}
+
+.arrow-left {
+  left: 10px; /* Adicionado */
+}
+
+.arrow-right {
+  right: 10px; /* Adicionado */
+}
+
+.card:hover {
+transform: translateY(-5px);
+box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+    .card-icon {
+    display: inline-block; /* Garante que o emoji seja tratado como um bloco */
+    vertical-align: middle; /* Alinha o emoji verticalmente */
+    background: none; /* Remove qualquer fundo que possa causar a listra */
+    border: none; /* Remove qualquer borda que possa causar a listra */
+    font-size: 40px; /* Tamanho do ícone */
+    margin-bottom: 10px; /* Espaçamento abaixo do ícone */
+  }
+
+  .card-title {
+    font-weight: bold;
+    margin: 10px 0;
+    }
+
+    .card-description {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .card-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    body.dark .atrasado {
+    background-color: #721c24; /* Cor de fundo para atrasado no tema escuro */
+    color: #f8d7da; /* Cor do texto para atrasado no tema escuro */
+    }
+
+    body.dark .dentro-prazo {
+    background-color: #155724; /* Cor de fundo para dentro do prazo no tema escuro */
+    color: #d4edda; /* Cor do texto para dentro do prazo no tema escuro */
+    }
+
+    body.dark .card-description {
+    color: #f1f1f1; /* Cor do texto da descrição no tema escuro */
+    } 
+
+    body.dark .atalhos-cards {
+    background-color: #333; /* Cor de fundo para o tema escuro */
+    color: #f1f1f1; /* Cor do texto para o tema escuro */
+    }
+
+body.dark .atalhos-cards h3 {
+  color: #f1f1f1; /* Cor do título para o tema escuro */
+}
+
+ /* Responsividade */
+ @media (max-width: 600px) {
+      .form-container {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cabecalho">
+    <div class="logo-titulo">
+      <img id="logoEmpresa" src="imagens/ELEV1.png" alt="Logo" />
+      <h2>Controle de Chamados</h2>
+    </div>
+    <div class="menu-container">
+      <button class="menu-button" onclick="toggleMenu()">⋯</button>
+      <div class="menu-options" id="menuOptions">
+        <button onclick="setTheme('light')">☀️ Tema Claro</button>
+        <button onclick="setTheme('dark')">🌙 Tema Escuro</button>
+      </div>
+    </div>
+  </div>
+  <div class="atalhos-cards">
+    <h3>Atalhos Rápidos</h3>
+    <div class="cards-container" id="cardsContainer">
+      <div class="card" onclick="window.open('http://192.168.9.202/dashboard/central_servicos', '_blank')">
+        <div class="card-icon"><i class="fas fa-tachometer-alt"></i></div>
+        <div class="card-title">Dashboard</div>
+        <div class="card-description">Acesse o painel de controle.</div>
+      </div>
+      <div class="card" onclick="window.open('http://192.168.20.99:3000/d/d3408e33-f25b-4b6a-8c55-83726d77d93e/geral-producao?orgId=3&refresh=1m', '_blank')">
+        <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="card-title">Grafana</div>
+        <div class="card-description">Visualize dados de produção.</div>
+      </div>
+      <div class="card" onclick="window.open('https://app.zenvia.com/?iss=https%3A%2F%2Faccounts.zenvia.com%2F', '_blank')">
+        <div class="card-icon"><i class="fas fa-comments"></i></div>
+        <div class="card-title">Zenvia</div>
+        <div class="card-description">Gerencie suas mensagens.</div>
+      </div>
+      <div class="card" onclick="window.open('https://omnipbx.elev.tec.br/nxt4000/login.php', '_blank')">
+        <div class="card-icon"><i class="fas fa-phone"></i></div>
+        <div class="card-title">OmniPBX</div>
+        <div class="card-description">Acesse o sistema de telefonia.</div>
+      </div>
+      <div class="card" onclick="window.open('https://omniconnect.elev.tec.br/logs/modules', '_blank')">
+        <div class="card-icon"><i class="fas fa-plug"></i></div>
+        <div class="card-title">Omniconect</div>
+        <div class="card-description">Acesse o sistema de conectividade.</div>
+      </div>
+      <div class="card" onclick="window.open('https://zabbix.com', '_blank')">
+        <div class="card-icon"><i class="fas fa-server"></i></div>
+        <div class="card-title">Zabbix</div>
+        <div class="card-description">Monitore a infraestrutura.</div>
+      </div>
+      <div class="card" onclick="window.open('https://elevbr.sharepoint.com/sites/operacoes_suporte2', '_blank')">
+        <div class="card-icon"><i class="fas fa-file-alt"></i></div>
+        <div class="card-title">Intranet Suporte</div>
+        <div class="card-description">Acesso à documentos exclusivos.</div>
+      </div>
+      <div class="card" onclick="window.open('https://fenix.com', '_blank')">
+        <div class="card-icon"><i class="fas fa-search"></i></div>
+        <div class="card-title">Fenix</div>
+        <div class="card-description">Acesse o monitoramento de itens.</div>
+      </div>
+    </div>
+    <button class="arrow arrow-left" onclick="moveLeft()">&#10094;</button>
+    <button class="arrow arrow-right" onclick="moveRight()">&#10095;</button>
+  </div>  
+    </div>
+  </div>
+</body>
+    <div class="form-container">
+      <input type="text" id="numero" placeholder="#️⃣ Número do Chamado" />
+      <input type="text" id="cliente" placeholder="👤 Nome do Cliente" />
+      <input type="text" id="titulo" placeholder="📝 Título do Chamado" />
+      <input type="date" id="dataAbertura" />
+      <input type="url" id="link" placeholder="🔗 Link do Projeto" />
+      <button onclick="salvarChamado()">💾 Salvar</button>
+    </div>
+  <div class="form-container">
+    <input type="text" id="filtroTitulo" placeholder="🔍 BUSCAR POR TÍTULO" oninput="carregarChamados()" />
+    <input type="text" id="filtroCliente" placeholder="🔍 BUSCAR POR CLIENTE" oninput="carregarChamados()" />
+  </div>
+
+  <div class="tabs">
+    <button class="tab-button active" onclick="abrirAba('abertos')">
+      📂 Em Aberto <span id="countAbertos" class="count-badge">0</span>
+    </button>
+    <button class="tab-button" onclick="abrirAba('finalizados')">
+      📁 Finalizados <span id="countFinalizados" class="count-badge">0</span>
+    </button>
+  </div>
+
+  <div id="abertos" class="tab-content active">
+    <h3>Chamados em Aberto</h3>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Cliente</th>
+            <th>Título</th>
+            <th>Data</th>
+            <th>Dias</th>
+            <th>Status</th>
+            <th>Link</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaChamados"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="finalizados" class="tab-content">
+    <h3>Chamados Finalizados</h3>
+    <input type="date" id="filtroDataFinalizados" oninput="carregarChamados()" />
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Cliente</th>
+            <th>Título</th>
+            <th>Data Abertura</th>
+            <th>Data Fim</th>
+            <th>Link</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaFinalizados"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal para seleção de data de finalização -->
+  <div id="modalFinalizar">
+    <div id="modalContent">
+      <label for="dataFinalizacaoInput">Selecione a data de finalização:</label>
+      <input type="date" id="dataFinalizacaoInput" />
+      <div>
+        <button id="btnOk">OK</button>
+        <button id="btnCancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rodapé com data e hora atuais -->
+  <div class="footer" id="footerDateTime"></div>
+
+  <script>
+    let indiceParaFinalizar = null;
+
+    function toggleMenu() {
+      const menu = document.getElementById('menuOptions');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+      function setTheme(theme) {
+      document.body.classList.toggle('dark', theme === 'dark');
+      localStorage.setItem('tema', theme);
+      document.getElementById('menuOptions').style.display = 'none';
+
+      const logo = document.getElementById('logoEmpresa');
+      if (logo) {
+        logo.src = theme === 'dark' ? 'imagens/ELEV2.png' : 'imagens/ELEV1.png';
+      }
+      // Modal theme toggle
+      const modalContent = document.getElementById('modalContent');
+      if (modalContent) {
+        modalContent.classList.toggle('dark', theme === 'dark');
+      }
+      // Footer theme toggle
+      const footer = document.getElementById('footerDateTime');
+      if (footer) {
+        footer.classList.toggle('dark', theme === 'dark');
+      }
+    }
+
+    function carregarTema() {
+      const temaSalvo = localStorage.getItem('tema');
+      if (temaSalvo) setTheme(temaSalvo);
+    }
+
+    function calcularDias(data) {
+      const hoje = new Date();
+      const abertura = new Date(data);
+      return Math.floor((hoje - abertura) / (1000 * 60 * 60 * 24));
+    }
+
+    function salvarChamado() {
+      const numero = document.getElementById('numero').value.toUpperCase();
+      const cliente = document.getElementById('cliente').value.toUpperCase();
+      const titulo = document.getElementById('titulo').value.toUpperCase();
+      const dataAbertura = document.getElementById('dataAbertura').value;
+      const link = document.getElementById('link').value;
+
+      if (!numero || !cliente || !titulo || !dataAbertura || !link) {
+        alert('⚠️ Preencha todos os campos.');
+        return;
+      }
+
+      const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
+      chamados.push({ numero, cliente, titulo, dataAbertura, link });
+      localStorage.setItem('chamados', JSON.stringify(chamados));
+      document.querySelectorAll('.form-container input').forEach(input => input.value = '');
+      carregarChamados();
+    }
+
+    function excluirChamado(index) {
+      if (confirm('Deseja realmente excluir o chamado?')) {
+        const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
+        chamados.splice(index, 1);
+        localStorage.setItem('chamados', JSON.stringify(chamados));
+        carregarChamados();
+      }
+    }
+
+    function abrirModalFinalizar(index) {
+      indiceParaFinalizar = index;
+      const modal = document.getElementById('modalFinalizar');
+      const inputData = document.getElementById('dataFinalizacaoInput');
+      inputData.value = new Date().toISOString().split('T')[0]; // Data atual padrão
+      modal.classList.add('active');
+      inputData.focus();
+    }
+
+    function fecharModalFinalizar() {
+      const modal = document.getElementById('modalFinalizar');
+      modal.classList.remove('active');
+      indiceParaFinalizar = null;
+      document.getElementById('dataFinalizacaoInput').value = '';
+    }
+
+    function confirmarFinalizar() {
+      const dataSelecionada = document.getElementById('dataFinalizacaoInput').value;
+      if (!dataSelecionada) {
+        alert('Por favor, selecione uma data de finalização.');
+        return;
+      }
+      const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
+      const finalizados = JSON.parse(localStorage.getItem('finalizados')) || [];
+      const chamado = chamados.splice(indiceParaFinalizar, 1)[0];
+      chamado.dataFim = dataSelecionada;
+      finalizados.push(chamado);
+      localStorage.setItem('chamados', JSON.stringify(chamados));
+      localStorage.setItem('finalizados', JSON.stringify(finalizados));
+      fecharModalFinalizar();
+      carregarChamados();
+    }
+
+    function finalizarChamado(index) {
+      abrirModalFinalizar(index);
+    }
+
+    function reabrirChamado(index) {
+      const finalizados = JSON.parse(localStorage.getItem('finalizados')) || [];
+      const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
+      const chamado = finalizados.splice(index, 1)[0];
+      chamados.push(chamado);
+      localStorage.setItem('finalizados', JSON.stringify(finalizados));
+      localStorage.setItem('chamados', JSON.stringify(chamados));
+      carregarChamados();
+    }
+
+    function carregarChamados() {
+      const filtroTitulo = document.getElementById('filtroTitulo').value.toUpperCase();
+      const filtroCliente = document.getElementById('filtroCliente').value.toUpperCase();
+      const filtroDataFinalizados = document.getElementById('filtroDataFinalizados').value;
+
+      const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
+      const finalizados = JSON.parse(localStorage.getItem('finalizados')) || [];
+
+      // Atualiza os contadores de chamados
+      document.getElementById('countAbertos').textContent = chamados.length;
+      document.getElementById('countFinalizados').textContent = finalizados.length;
+
+      const tabela = document.getElementById('tabelaChamados');
+      tabela.innerHTML = '';
+
+      chamados
+        .filter(chamado =>
+          chamado.titulo.toUpperCase().includes(filtroTitulo) &&
+          chamado.cliente.toUpperCase().includes(filtroCliente)
+        )
+        .forEach((chamado, index) => {
+          const dias = calcularDias(chamado.dataAbertura);
+          const statusClass = dias > 5 ? 'atrasado' : 'dentro-prazo';
+          const statusText = dias > 5 ? '🔴 Atrasado' : '🟢 Dentro do Prazo';
+
+          const row = `
+            <tr class="${statusClass}">
+              <td>${chamado.numero}</td>
+              <td>${chamado.cliente}</td>
+              <td>${chamado.titulo}</td>
+              <td>${chamado.dataAbertura}</td>
+              <td>${dias}</td>
+               <td>${statusText}</td>
+          <td><a class="link-icon" href="${chamado.link}" target="_blank" title="Abrir Link">🔗</a></td>
+          <td>
+            <button class="action-button finalizar" onclick="finalizarChamado(${index})" title="Finalizar chamado">
+              <img src="imagens/check_16000969.png" alt="Finalizar" style="width: 30px; height: 30px;" />
+            </button>
+            <button class="action-button excluir" onclick="excluirChamado(${index})" title="Excluir chamado">
+              <img src="imagens/business_13577325.png" alt="Excluir" style="width: 30px; height: 30px;" />
+            </button>
+          </td>
+        </tr>
+      `;
+      tabela.innerHTML += row;
+    });
+
+      // Chamados finalizados
+      const tabelaFinalizados = document.getElementById('tabelaFinalizados');
+      tabelaFinalizados.innerHTML = '';
+
+      finalizados
+        .filter(chamado => {
+          if (!filtroDataFinalizados) return true;
+          return chamado.dataFim === filtroDataFinalizados;
+        })
+        .forEach((chamado, index) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${chamado.numero}</td>
+            <td>${chamado.cliente}</td>
+            <td>${chamado.titulo}</td>
+            <td>${chamado.dataAbertura}</td>
+            <td>${chamado.dataFim}</td>
+            <td><a class="link-icon" href="${chamado.link}" target="_blank" title="Abrir Link">🔗</a></td>
+            <td>
+              <button class="action-button finalizar" onclick="reabrirChamado(${index})" title="Reabrir chamado">
+                <img src="imagens/renewable_15353284.png" alt="Reabrir" style="width: 30px; height: 30px;" />
+              </button>
+            </td>
+          `;
+          tabelaFinalizados.appendChild(tr);
+        });
+    }
+
+    function abrirAba(nome) {
+      document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active'));
+      document.getElementById(nome).classList.add('active');
+
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+    }
+
+    function exportarExcel() {
+      const chamados = JSON.parse(localStorage.getItem('chamados')) || [];
+      const finalizados = JSON.parse(localStorage.getItem('finalizados')) || [];
+
+      // Construir CSV
+      let csv = 'Chamados Em Aberto\nNúmero;Cliente;Título;Data Abertura;Dias;Status;Link\n';
+      chamados.forEach(chamado => {
+        const dias = calcularDias(chamado.dataAbertura);
+        const status = dias > 7 ? 'Atrasado' : 'Dentro do Prazo';
+        csv += `${chamado.numero};${chamado.cliente};${chamado.titulo};${chamado.dataAbertura};${dias};${status};${chamado.link}\n`;
+      });
+
+      csv += '\nChamados Finalizados\nNúmero;Cliente;Título;Data Abertura;Data Fim;Link\n';
+      finalizados.forEach(chamado => {
+        csv += `${chamado.numero};${chamado.cliente};${chamado.titulo};${chamado.dataAbertura};${chamado.dataFim};${chamado.link}\n`;
+      });
+
+      // Criar e baixar arquivo CSV
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'chamados_exportados.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Atualiza data e hora atual no rodapé a cada segundo
+    function atualizarDataHora() {
+      const now = new Date();
+      const options = { 
+        year: 'numeric', month: '2-digit', day: '2-digit', 
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false 
+      };
+      const formatted = now.toLocaleDateString('pt-BR', options).replace(',', ' -');
+      document.getElementById('footerDateTime').textContent = `Data e Hora Atual: ${formatted}`;
+    }
+
+    // Atualizar data/hora e carregar tema e chamados ao iniciar
+    window.onload = () => {
+      carregarTema();
+      carregarChamados();
+      atualizarDataHora();
+      setInterval(atualizarDataHora, 1000);
+    };
+
+    // Fecha o menu ao clicar fora
+    window.addEventListener('click', function(event) {
+      if (!event.target.matches('.menu-button')) {
+        const menu = document.getElementById('menuOptions');
+        if (menu.style.display === 'block') {
+          menu.style.display = 'none';
+        }
+      }
+    });
+
+    // Controlar botões modal
+    document.getElementById('btnOk').addEventListener('click', confirmarFinalizar);
+    document.getElementById('btnCancel').addEventListener('click', fecharModalFinalizar);
+    function toggleModal() {
+  const modal = document.getElementById('atalhosModal');
+  modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+}
+// Fecha o modal se o usuário clicar fora dele
+window.onclick = function(event) {
+  const modal = document.getElementById('atalhosModal');
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+}
+let currentIndex = 0; // Adicionado
+const cardsContainer = document.getElementById('cardsContainer'); // Adicionado
+const totalCards = document.querySelectorAll('.card').length; // Adicionado
+const cardsToShow = 4; // Número de cartões visíveis // Adicionado
+function moveLeft() { // Adicionado
+  if (currentIndex > 0) { // Adicionado
+    currentIndex--; // Adicionado
+    updateCarousel(); // Adicionado
+  } // Adicionado
+}
+function moveRight() { // Adicionado
+  if (currentIndex < totalCards - cardsToShow) { // Adicionado
+    currentIndex++; // Adicionado
+    updateCarousel(); // Adicionado
+  } // Adicionado
+}
+function updateCarousel() { // Adicionado
+  const offset = -currentIndex * (100 / cardsToShow); // Adicionado
+  cardsContainer.style.transform = `translateX(${offset}%)`; // Adicionado
+}
+  </script>
+</body>
+</html>
