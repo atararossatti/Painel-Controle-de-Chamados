@@ -140,15 +140,16 @@
     <h3>Atalhos Rápidos</h3>
     <div class="cards-container" id="cardsContainer">
       <div class="card" data-url="http://192.168.9.202/dashboard/central_servicos"><div class="card-icon"><i class="fas fa-tachometer-alt"></i></div><div class="card-title">Dashboard</div><div class="card-description">Acesse o painel.</div></div>
-      <div class="card" data-url="http://192.168.20.99:3000/d/d3408e33-f25b-4b6a-8c55-83726d77d93e/geral-producao?orgId=3&refresh=1m"><div class="card-icon"><i class="fas fa-chart-line"></i></div><div class="card-title">Grafana</div><div class="card-description">Dados de produção.</div></div>
-      <div class="card" data-url="https://app.zenvia.com/?iss=https%3A%2F%2Faccounts.zenvia.com%2F"><div class="card-icon"><i class="fas fa-comments"></i></div><div class="card-title">Zenvia</div><div class="card-description">Gerencie mensagens.</div></div>
+      <div class="card" data-url="https://omniplus.elev.tec.br/login"><div class="card-icon"><i class="fas fa-layer-group"></i></div><div class="card-title">Omniplus</div><div class="card-description">Plataforma de serviços.</div></div>
       <div class="card" data-url="https://omnipbx.elev.tec.br/nxt4000/login.php"><div class="card-icon"><i class="fas fa-phone"></i></div><div class="card-title">OmniPBX</div><div class="card-description">Acesse a telefonia.</div></div>
       <div class="card" data-url="https://omniconnect.elev.tec.br/logs/modules"><div class="card-icon"><i class="fas fa-plug"></i></div><div class="card-title">Omniconect</div><div class="card-description">Conectividade.</div></div>
-      <div class="card" data-url="https://zabbix.com"><div class="card-icon"><i class="fas fa-server"></i></div><div class="card-title">Zabbix</div><div class="card-description">Monitore a infra.</div></div>
-      <div class="card" data-url="https://elevbr.sharepoint.com/sites/operacoes_suporte2"><div class="card-icon"><i class="fas fa-file-alt"></i></div><div class="card-title">Intranet</div><div class="card-description">Documentos.</div></div>
       <div class="card" data-url="https://fenix.com"><div class="card-icon"><i class="fas fa-search"></i></div><div class="card-title">Fenix</div><div class="card-description">Monitoramento.</div></div>
-      <div class="card" data-url="https://bytestash.elev.internal.br/public/snippets"><div class="card-icon"><i class="fas fa-box-open"></i></div><div class="card-title">ByteStash</div><div class="card-description">Snippets de código.</div></div>
+      <div class="card" data-url="https://zabbix.com"><div class="card-icon"><i class="fas fa-server"></i></div><div class="card-title">Zabbix</div><div class="card-description">Monitore a infra.</div></div>
+      <div class="card" data-url="http://192.168.20.99:3000/d/d3408e33-f25b-4b6a-8c55-83726d77d93e/geral-producao?orgId=3&refresh=1m"><div class="card-icon"><i class="fas fa-chart-line"></i></div><div class="card-title">Grafana</div><div class="card-description">Dados de produção.</div></div>
       <div class="card" data-url="https://crm.elev.tec.br/login.php"><div class="card-icon"><i class="fas fa-users"></i></div><div class="card-title">CRM</div><div class="card-description">Gestão de clientes.</div></div>
+      <div class="card" data-url="https://elevbr.sharepoint.com/sites/operacoes_suporte2"><div class="card-icon"><i class="fas fa-file-alt"></i></div><div class="card-title">Intranet</div><div class="card-description">Documentos.</div></div>
+      <div class="card" data-url="https://bytestash.elev.internal.br/public/snippets"><div class="card-icon"><i class="fas fa-box-open"></i></div><div class="card-title">ByteStash</div><div class="card-description">Snippets de código.</div></div>
+      <div class="card" data-url="https://app.zenvia.com/?iss=https%3A%2F%2Faccounts.zenvia.com%2F"><div class="card-icon"><i class="fas fa-comments"></i></div><div class="card-title">Zenvia</div><div class="card-description">Gerencie mensagens.</div></div>
     </div>
     <button class="arrow arrow-left" id="arrowLeftBtn">❮</button>
     <button class="arrow arrow-right" id="arrowRightBtn">❯</button>
@@ -412,6 +413,17 @@
         carregarDadosChamados(); carregarDadosAvisos();
         renderizarChamados(); renderizarAvisos();
         atualizarDataHora(); setInterval(atualizarDataHora, 1000);
+
+        // Adiciona a funcionalidade de clique aos cards de atalho
+        dom.carousel.cards.forEach(card => {
+          card.addEventListener('click', () => {
+            const url = card.dataset.url; // Pega a URL do atributo data-url
+            if (url) {
+              // Abre o link em uma nova aba para não perder a página atual
+              window.open(url, '_blank'); 
+            }
+          });
+        });
       };
       init();
     });
