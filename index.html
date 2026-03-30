@@ -213,15 +213,6 @@
   justify-content: center;
   background: #0f172a; /* fundo dark */
 }
-
-.login-wrapper {
-  height: 100vh;
-  width: 100vw;
-  background: #000; /* PRETO PURO */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
     
 /* From Uiverse.io by Pinparker */ 
 .form {
@@ -730,37 +721,64 @@ body.login-active {
 
   <script>
 
-//Inserindo novo script para tela de login
-const fazerLogin = async () => {
-    const usuario = document.getElementById('loginUser').value;
-    const senha = document.getElementById('loginPass').value;
+          //AUTO LOGIN (fica no topo)
+          window.addEventListener('DOMContentLoaded', () => {
+              const token = localStorage.getItem('token');
 
-    const res = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuario, senha })
-    });
+              if (token) {
+                  mostrarSistema();
+                  init ();
+              } else {
+                  mostrarLogin();
+              }
+          });
 
-    const data = await res.json();
 
-    if (data.sucesso) {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('sidebar').style.display = 'block';
-    document.querySelector('.footer').style.display = 'block';
 
-    document.body.classList.remove('login-active'); // 👈 ESSENCIAL
-    document.body.classList.add('menu-open');
-    } else {
-        alert('Login inválido');
-    }
-};
+          function mostrarSistema() {
+              document.getElementById('loginScreen').style.display = 'none';
+              document.getElementById('app').style.display = 'block';
+              document.getElementById('sidebar').style.display = 'block';
+              document.querySelector('.footer').style.display = 'block';
 
-//Finalizada tela de login 
+              document.body.classList.remove('login-active');
+              document.body.classList.add('menu-open');
+          }
 
-        document.body.classList.add('login-active');
-        document.addEventListener('DOMContentLoaded', () => {
-            const dom = {
+          function mostrarLogin() {
+              document.getElementById('loginScreen').style.display = 'flex';
+              document.getElementById('app').style.display = 'none';
+              document.getElementById('sidebar').style.display = 'none';
+              document.querySelector('.footer').style.display = 'none';
+
+              document.body.classList.add('login-active');
+          }
+
+
+          //LOGIN
+        async function fazerLogin() {
+            const usuario = document.getElementById('loginUser').value;
+            const senha = document.getElementById('loginPass').value;
+
+            const res = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usuario, senha })
+            });
+
+            const data = await res.json();
+
+            if (data.sucesso) {
+                localStorage.setItem('token', data.token);
+                mostrarSistema();
+                init(); // 👈 IMPORTANTE
+            } else {
+                alert('Login inválido');
+            }
+        };
+
+ //Finalizada tela de login 
+                      const dom = {
                 body: document.body, logoEmpresa: document.getElementById('logoEmpresa'), themeToggleBtn: document.getElementById('theme-toggle-btn'), menuBtn: document.getElementById('menuBtn'), menuOptions: document.getElementById('menuOptions'),
                 userAvatarBtn: document.getElementById('userAvatarBtn'), userAvatarImg: document.getElementById('userAvatarImg'), userMenu: document.getElementById('userMenu'), 
                 changePhotoBtn: document.getElementById('changePhotoBtn'), logoutBtn: document.getElementById('logoutBtn'), photoUploadInput: document.getElementById('photoUploadInput'),
@@ -781,24 +799,47 @@ const fazerLogin = async () => {
                 dashboardGeral: { metricAbertos: document.getElementById('metricAbertos'), metricFinalizados: document.getElementById('metricFinalizados'), metricTempoMedio: document.getElementById('metricTempoMedio'), slaAlertsList: document.getElementById('slaAlertsList'), prioridadeChartCtx: document.getElementById('prioridadeChart').getContext('2d'), clienteChartCtx: document.getElementById('clienteChart').getContext('2d'), },
                 relatorio: { dataDe: document.getElementById('filtroDataDe'), dataAte: document.getElementById('filtroDataAte'), status: document.getElementById('filtroStatusRelatorio'), usuario: document.getElementById('filtroUsuarioRelatorio'), gerarBtn: document.getElementById('gerarRelatorioBtn'), resultsContainer: document.getElementById('report-results'), summary: document.getElementById('reportSummary'), exportBtn: document.getElementById('exportRelatorioBtn'), table: document.getElementById('tabelaRelatorio'), }
             };
+
+                dom.logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('token');
+                    mostrarLogin();
+                });
+
+
+
             let idParaAcao = { finalizar: null, editar: null };
             let chamadosAbertos = [], chamadosFinalizados = [], avisos = [], currentReportData = [];
             let charts = { prioridade: null, cliente: null };
             const currentUserAnalyst = "ATARA SILVA";
             
             const carregarDados = async () => {
-                 const res = await fetch('http://localhost:3000/chamados');
-                 chamadosAbertos = await res.json();
-                 chamadosFinalizados = [];
-            };
+                const res = await fetch('http://localhost:3000/chamados', {
+                    headers: {
+                        Authorization: localStorage.getItem('token')
+                    }
+                });
+                if (res.status === 401 || res.status === 403) {
+                        console.log('Sessão expirada');
+                        localStorage.removeItem('token');
+                        mostrarLogin(); // volta pro login direto
+                        return;
+                    }
+            const data = await res.json();
+                    chamadosAbertos = data;
+                };
 
-            const salvarDadosChamados = async (chamado) => {
+
+const salvarDadosChamados = async (chamado) => {
     await fetch('http://localhost:3000/chamados', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: localStorage.getItem('token')
+        },
         body: JSON.stringify(chamado)
     });
 };
+
             const salvarDadosAvisos = () => { localStorage.setItem('avisos_v1', JSON.stringify(avisos)); };
             const calcularDias = (data) => { if(!data) return 0; const hoje = new Date(); hoje.setHours(0, 0, 0, 0); const abertura = new Date(data); return Math.max(0, Math.floor((hoje - abertura) / (1000 * 60 * 60 * 24))); };
             const renderizarTudo = () => { renderizarTabelasEContadores(); renderizarKanban(); renderizarAvisos(); if(document.getElementById('view-dashboard-geral').classList.contains('active')) renderizarDashboardGeral(); if(document.getElementById('view-relatorio').classList.contains('active')) renderizarFiltrosRelatorio(); };
@@ -867,8 +908,6 @@ const fazerLogin = async () => {
             const importFromCsv = (file, target) => { if (!file) return; const reader = new FileReader(); reader.onload = (e) => { const rows = e.target.result.split('\n').filter(r => r.trim()); if(rows.length < 2 || !confirm("Atenção! Isso substituirá os dados atuais. Continuar?")) return; const headers = rows[0].split(',').map(h=>h.trim()); const data = rows.slice(1).map(r => { const values = r.split(','); return headers.reduce((obj, h, i) => { let v = values[i]; if(v==='true')v=true; else if(v==='false')v=false; else if(!isNaN(v) && v.trim() !== '' && !h.includes('numero'))v=Number(v); obj[h]=v; return obj;},{}); }); if (target === 'abertos') chamadosAbertos = data; else chamadosFinalizados = data; salvarDadosChamados(); renderizarTudo(); alert("Dados importados!"); }; reader.readAsText(file); };
             const loadUserProfile = () => { const savedAvatar = localStorage.getItem('user_avatar'); if(savedAvatar) dom.userAvatarImg.src = savedAvatar; }
             
-            const init = async () => {
-                await carregarDados(); loadUserProfile();
                 dom.sideMenu.toggleBtn.addEventListener('click', () => dom.body.classList.toggle('menu-open'));
                 dom.sideMenu.navItems.forEach(item => item.addEventListener('click', (e) => switchView(e.currentTarget.dataset.view)));
                 dom.tabs.buttons.forEach(button => button.addEventListener('click', (e) => abrirAba(e.currentTarget.dataset.tab)));
@@ -910,13 +949,20 @@ const fazerLogin = async () => {
                 dom.relatorio.gerarBtn.addEventListener('click', gerarRelatorio);
                 dom.relatorio.exportBtn.addEventListener('click', () => { const dataToExport = currentReportData.map(({id, isPinned, lastInternalUpdate, ...keep}) => keep); exportToCsv('relatorio_chamados.csv', dataToExport); });
 
-                atualizarDataHora(); setInterval(atualizarDataHora, 1000);
+                const init = async () => {
+                await carregarDados();
+
+
+                atualizarDataHora(); 
+                setInterval(atualizarDataHora, 1000);
+                
+
                 renderizarTudo();
                 switchView('meus-chamados');
-            };
+                };   
 
-            init();
-    });
+
+                            
 </script>
 </body>
 </html>
